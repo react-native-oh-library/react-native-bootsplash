@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "boot_splash_desc",
+      "value": "description"
+    },
+    {
+      "name": "boot_splash_label",
+      "value": "label"
+    }
+  ]
+}
