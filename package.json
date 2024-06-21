@@ -1,6 +1,6 @@
 {
   "name": "react-native-bootsplash",
-  "version": "5.5.3",
+  "version": "5.5.3-0.0.1",
   "license": "MIT",
   "description": "Display a bootsplash on your app starts. Hide it when you want.",
   "author": "Mathieu Acthernoene <zoontek@gmail.com>",
@@ -89,6 +89,13 @@
     "react-native-builder-bob": "^0.23.2",
     "typescript": "^5.3.3"
   },
+ "harmony": {
+      "codegenConfig": {
+        "specPaths": [
+          "./src"
+        ]
+      }
+    },
   "codegenConfig": {
     "name": "RNBootSplashSpec",
     "type": "modules",
