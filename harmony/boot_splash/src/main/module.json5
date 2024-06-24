@@ -1,0 +1,7 @@
+{
+  module: {
+    name: 'boot_splash',
+    type: 'har',
+    deviceTypes: ['default'],
+  },
+}
