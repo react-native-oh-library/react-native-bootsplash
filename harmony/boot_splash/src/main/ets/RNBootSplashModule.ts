@@ -1,3 +1,27 @@
+/**
+ * MIT License
+ *
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import { TurboModule } from '@rnoh/react-native-openharmony/ts';
 import { TM } from "@rnoh/react-native-openharmony/generated/ts";
 import Logger from './Logger';
@@ -8,7 +32,8 @@ let visible: boolean = false;
 const TAG = "BootSplashModule";
 
 export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spec {
-  maybeRunAnimate(layoutReady:boolean,logoReady:boolean,brandReady:boolean,animateHasBeenCalled:boolean,animate:()=>void){
+  maybeRunAnimate(layoutReady: boolean, logoReady: boolean, brandReady: boolean, animateHasBeenCalled: boolean,
+    animate: () => void) {
     if (layoutReady && logoReady && brandReady && !animateHasBeenCalled) {
       animateHasBeenCalled = true;
       this.hide(false).then(() => {
@@ -21,7 +46,7 @@ export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spe
     }
   }
 
-  getContainerStyle(backgroundColor:string):Object{
+  getContainerStyle(backgroundColor: string): Object {
     return {
       position: 'absolute',
       left: 0,
@@ -34,7 +59,7 @@ export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spe
     }
   }
 
-  getLogo(logoFinalSrc: ImageSource,logoWidth:number,logoHeight:number):ImageProps{
+  getLogo(logoFinalSrc: ImageSource, logoWidth: number, logoHeight: number): ImageProps {
     return logoFinalSrc == null
       ? { source: -1 }
       : {
@@ -48,7 +73,8 @@ export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spe
       };
   }
 
-  getBrand(brandFinalSrc:ImageSource,brandBottom:number|undefined,brandWidth:number|undefined,brandHeight:number|undefined):ImageProps{
+  getBrand(brandFinalSrc: ImageSource, brandBottom: number | undefined, brandWidth: number | undefined,
+    brandHeight: number | undefined): ImageProps {
     return brandFinalSrc == null
       ? { source: -1 }
       : {
@@ -66,56 +92,56 @@ export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spe
 
   useHideAnimation(config: TM.RNBootSplash.UseHideAnimationConfig,
     animate: () => void): TM.RNBootSplash.UseHideAnimation {
-      Logger.info(TAG, "config" + JSON.stringify(config))
-      const skipLogo = config.logo == null;
-      const skipBrand = config.manifest.brand == null || config.brand == null;
-      const logoWidth = config.manifest.logo.width;
-      const logoHeight = config.manifest.logo.height;
-      const brandBottom = config.manifest.brand?.bottom;
-      const brandWidth = config.manifest.brand?.width;
-      const brandHeight = config.manifest.brand?.height;
-      const stants: Stants = this.getConstants();
-      const darkModeEnabled: boolean = stants != null ? stants.darkModeEnabled : false;
-      const backgroundColor: string =
-        darkModeEnabled && config.manifest.darkBackground != null
-          ? config.manifest.darkBackground
-          : config.manifest.background;
-      const logoFinalSrc: ImageSource = skipLogo
-        ? undefined
-        : darkModeEnabled && config.darkLogo != null
-          ? config.darkLogo
-          : config.logo;
-      const brandFinalSrc: ImageSource = skipBrand
-        ? undefined
-        : darkModeEnabled && config.darkBrand != null
-          ? config.darkBrand
-          : config.brand;
-      let layoutReady = false;
-      let logoReady = skipLogo;
-      let brandReady = skipBrand;
-      let animateHasBeenCalled = false;
+    Logger.info(TAG, "config" + JSON.stringify(config))
+    const skipLogo = config.logo == null;
+    const skipBrand = config.manifest.brand == null || config.brand == null;
+    const logoWidth = config.manifest.logo.width;
+    const logoHeight = config.manifest.logo.height;
+    const brandBottom = config.manifest.brand?.bottom;
+    const brandWidth = config.manifest.brand?.width;
+    const brandHeight = config.manifest.brand?.height;
+    const stants: Stants = this.getConstants();
+    const darkModeEnabled: boolean = stants != null ? stants.darkModeEnabled : false;
+    const backgroundColor: string =
+      darkModeEnabled && config.manifest.darkBackground != null
+        ? config.manifest.darkBackground
+        : config.manifest.background;
+    const logoFinalSrc: ImageSource = skipLogo
+      ? undefined
+      : darkModeEnabled && config.darkLogo != null
+        ? config.darkLogo
+        : config.logo;
+    const brandFinalSrc: ImageSource = skipBrand
+      ? undefined
+      : darkModeEnabled && config.darkBrand != null
+        ? config.darkBrand
+        : config.brand;
+    let layoutReady = false;
+    let logoReady = skipLogo;
+    let brandReady = skipBrand;
+    let animateHasBeenCalled = false;
 
 
     const containerStyle = this.getContainerStyle(backgroundColor)
-      const container: ViewStyle = {
-        style: containerStyle,
-      };
-      layoutReady = true;
+    const container: ViewStyle = {
+      style: containerStyle,
+    };
+    layoutReady = true;
 
 
-    const logo = this.getLogo(logoFinalSrc,logoWidth,logoHeight)
-      logoReady = true;
-    const brand = this.getBrand(brandFinalSrc,brandBottom,brandWidth,brandHeight)
+    const logo = this.getLogo(logoFinalSrc, logoWidth, logoHeight)
+    logoReady = true;
+    const brand = this.getBrand(brandFinalSrc, brandBottom, brandWidth, brandHeight)
 
-      brandReady = true;
-    this.maybeRunAnimate(layoutReady,logoReady,brandReady,animateHasBeenCalled,animate)
-      const re: TM.RNBootSplash.UseHideAnimation = {
-        container: container,
-        logo: logo,
-        brand: brand,
-      }
-      Logger.info(TAG, "return" + JSON.stringify(re));
-      return re;
+    brandReady = true;
+    this.maybeRunAnimate(layoutReady, logoReady, brandReady, animateHasBeenCalled, animate)
+    const re: TM.RNBootSplash.UseHideAnimation = {
+      container: container,
+      logo: logo,
+      brand: brand,
+    }
+    Logger.info(TAG, "return" + JSON.stringify(re));
+    return re;
 
   }
 
@@ -126,7 +152,7 @@ export class BootSplashModule extends TurboModule implements TM.RNBootSplash.Spe
     statusBarHeight?: number | undefined;
   } {
     return {
-      darkModeEnabled:true,
+      darkModeEnabled: true,
       logoSizeRatio: 1,
       navigationBarHeight: 0,
       statusBarHeight: 0,
