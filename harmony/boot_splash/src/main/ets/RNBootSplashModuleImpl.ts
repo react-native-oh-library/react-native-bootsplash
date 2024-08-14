@@ -22,43 +22,38 @@
  * SOFTWARE.
  */
 
-import hilog from '@ohos.hilog';
+import { window } from '@kit.ArkUI';
+import Logger from './Logger';
 
-class Logger {
-  private domain : number;
-  private prefix : string;
-  private format : string = '%{public}s, %{public}s';
-  private isDebug : boolean;
+export class RNBootSplashModuleImpl {
+  // 子窗口
+  private static splashWindow: window.Window;
 
   /**
-   * constructor.
-   *
-   * @param Prefix Identifies the log tag.
-   * @param domain Domain Indicates the service domain, which is a hexadecimal integer ranging from 0x0 to 0xFFFFF.
+   * 关闭启动屏
    */
-  constructor(prefix: string = 'MyApp', domain: number = 0xFF00, isDebug = false) {
-    this.prefix = prefix;
-    this.domain = domain;
-    this.isDebug = isDebug;
-  }
-
-  debug(...args: string[]): void {
-    if (this.isDebug) {
-      hilog.debug(this.domain, this.prefix, this.format, args);
+  public static hide(fade: boolean): Promise<void> {
+    Logger.info('hide this.splashWindow', JSON.stringify(this.splashWindow));
+    if (this.splashWindow && this.splashWindow.isWindowShowing()) {
+      this.splashWindow.destroyWindow((err) => {
+        if (err.code) {
+          Logger.error('Failed to destroy the window. Cause: ' + JSON.stringify(err));
+          return;
+        }
+        this.splashWindow = undefined;
+        Logger.info('destroy splashWindow success.');
+      });
     }
+    return Promise.resolve();
   }
 
-  info(...args: string[]): void {
-    hilog.info(this.domain, this.prefix, this.format, args);
+  public static isVisible(): Promise<boolean> {
+    return new Promise((resolve) => {
+      resolve(this.splashWindow && this.splashWindow.isWindowShowing());
+    });
   }
 
-  warn(...args: string[]) : void {
-    hilog.warn(this.domain, this.prefix, this.format, args);
-  }
-
-  error(...args: string[]) : void {
-    hilog.error(this.domain, this.prefix, this.format, args);
+  public static setSplashWindow(splashWindow) {
+    this.splashWindow = splashWindow;
   }
 }
-
-export default new Logger('RNBootSplash', 0xFF00, false)

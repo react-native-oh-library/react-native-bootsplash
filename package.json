@@ -1,50 +1,112 @@
 {
   "name": "@react-native-oh-tpl/react-native-bootsplash",
-  "version": "5.5.3-0.0.1",
-  "description": "Add numbers with TurboModules",
-  "react-native": "src/index",
-  "source": "src/index",
+  "version": "6.1.1-0.0.1",
+  "license": "MIT",
+  "description": "Display a bootsplash on your app starts. Hide it when you want.",
+  "author": "Mathieu Acthernoene <zoontek@gmail.com>",
+  "homepage": "https://github.com/zoontek/react-native-bootsplash",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/module/index.js",
+  "types": "dist/typescript/index.d.ts",
   "files": [
-    "src",
+    "dist",
     "android",
     "ios",
-    "harmony",
-    "rtn-calculator.podspec",
+    "src",
     "!android/build",
+    "!android/.cxx",
+    "!android/.gradle",
     "!ios/build",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__"
+    "!src/addon",
+    "RNBootSplash.podspec",
+    "app.plugin.js",
+    "react-native.config.js"
   ],
-  "keywords": ["react-native", "ios", "android", "harmony"],
-  "repository": "https://github.com/<your_github_handle>/rtn-bootsplash",
-  "author": "<Your Name> <your_email@your_provider.com> (https://github.com/<your_github_handle>)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/<your_github_handle>/rtn-bootsplash/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoontek/react-native-bootsplash.git"
   },
-  "homepage": "https://github.com/<your_github_handle>/rtn-bootsplash#readme",
-  "devDependencies": {
-	    "react-native-bootsplash": "5.5.3"
+  "keywords": [
+    "react-native-bootsplash",
+    "react-native",
+    "boot-splash",
+    "bootsplash",
+    "boot-screen",
+    "bootscreen",
+    "splash-screen",
+    "splashscreen",
+    "launch-screen",
+    "launchscreen"
+  ],
+  "scripts": {
+    "format": "prettier '**/*' -u -w",
+    "lint": "eslint --ext ts,tsx ./src",
+    "typecheck": "tsc --noEmit",
+    "build": "bob build"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "dist",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-organize-imports"
+    ]
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
+    "react": ">=18.1.0",
+    "react-native": ">=0.70.0"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^8.0.4",
+    "detect-indent": "^6.1.0",
+    "fs-extra": "^11.2.0",
+    "json5": "^2.2.3",
+    "node-html-parser": "^6.1.13",
+    "picocolors": "^1.0.0",
+    "prettier": "^3.2.5",
+    "sharp": "^0.32.6",
+    "ts-dedent": "^2.2.0",
+    "xml-formatter": "^3.6.2",
+    "react-native-bootsplash": "6.1.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.60",
+    "@types/semver": "^7.5.8",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "react": "18.2.0",
+    "react-native": "0.74.3",
+    "react-native-builder-bob": "^0.23.2",
+    "semver": "^7.6.2",
+    "typescript": "^5.4.5"
   },
   "harmony": {
-	"alias": "react-native-bootsplash",
-    "codegenConfig": {
-      "specPaths": [
-        "./src"
-      ]
-    }
-  },
+    "alias": "react-native-bootsplash",
+      "codegenConfig": {
+        "specPaths": [
+          "./src"
+        ]
+      }
+    },
   "codegenConfig": {
-    "name": "RTNBootSplashSpec",
+    "name": "RNBootSplashSpec",
     "type": "modules",
-    "jsSrcsDir": "src",
+    "jsSrcsDir": "./src",
     "android": {
-      "javaPackageName": "com.bootsplash"
+      "javaPackageName": "com.zoontek.rnbootsplash"
     }
   }
 }

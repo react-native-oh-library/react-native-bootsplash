@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ImageProps,
   ImageRequireSource,
+  ImageResizeMode,
+  ImageSourcePropType,
+  ImageStyle,
   Platform,
   StyleSheet,
-  ViewProps,
   ViewStyle,
 } from "react-native";
 import NativeModule from "./NativeRNBootSplash";
-import { TurboModuleRegistry } from "react-native";
-
 
 export type Config = {
   fade?: boolean;
@@ -31,6 +30,7 @@ export type Manifest = {
 
 export type UseHideAnimationConfig = {
   manifest: Manifest;
+  ready?: boolean;
 
   logo?: ImageRequireSource;
   darkLogo?: ImageRequireSource;
@@ -43,15 +43,36 @@ export type UseHideAnimationConfig = {
   navigationBarTranslucent?: boolean;
 };
 
+export type ContainerProps = {
+  style: ViewStyle;
+  onLayout: () => void;
+};
+
+export type LogoProps = {
+  source: ImageSourcePropType;
+  fadeDuration?: number;
+  resizeMode?: ImageResizeMode;
+  style?: ImageStyle;
+  onLoadEnd?: () => void;
+};
+
+export type BrandProps = {
+  source: ImageSourcePropType;
+  fadeDuration?: number;
+  resizeMode?: ImageResizeMode;
+  style?: ImageStyle;
+  onLoadEnd?: () => void;
+};
+
 export type UseHideAnimation = {
-  container: ViewProps;
-  logo: ImageProps;
-  brand: ImageProps;
+  container: ContainerProps;
+  logo: LogoProps;
+  brand: BrandProps;
 };
 
 export function hide(config: Config = {}): Promise<void> {
   const { fade = false } = config;
-  return NativeModule.hide(fade).then(() => { });
+  return NativeModule.hide(fade).then(() => {});
 }
 
 export function isVisible(): Promise<boolean> {
@@ -59,124 +80,129 @@ export function isVisible(): Promise<boolean> {
 }
 
 export function useHideAnimation(config: UseHideAnimationConfig) {
-  if (TurboModuleRegistry) {
-    const animate = config.animate;
-    const { container, logo, brand } = NativeModule.useHideAnimation(config, animate);
-    return { container, logo, brand };
-  } else {
-    const {
-      manifest,
+  const {
+    manifest,
+    ready = true,
 
-      logo: logoSrc,
-      darkLogo: darkLogoSrc,
-      brand: brandSrc,
-      darkBrand: darkBrandSrc,
+    logo: logoSrc,
+    darkLogo: darkLogoSrc,
+    brand: brandSrc,
+    darkBrand: darkBrandSrc,
 
-      animate,
+    animate,
 
-      statusBarTranslucent = false,
-      navigationBarTranslucent = false,
-    } = config;
+    statusBarTranslucent = false,
+    navigationBarTranslucent = false,
+  } = config;
 
-    const skipLogo = logoSrc == null;
-    const skipBrand = manifest.brand == null || brandSrc == null;
+  const skipLogo = logoSrc == null;
+  const skipBrand = manifest.brand == null || brandSrc == null;
 
-    const logoWidth = manifest.logo.width;
-    const logoHeight = manifest.logo.height;
-    const brandBottom = manifest.brand?.bottom;
-    const brandWidth = manifest.brand?.width;
-    const brandHeight = manifest.brand?.height;
+  const logoWidth = manifest.logo.width;
+  const logoHeight = manifest.logo.height;
+  const brandBottom = manifest.brand?.bottom;
+  const brandWidth = manifest.brand?.width;
+  const brandHeight = manifest.brand?.height;
 
-    const [
-      {
-        darkModeEnabled,
-        logoSizeRatio = 1,
-        navigationBarHeight = 0,
-        statusBarHeight = 0,
+  const [
+    {
+      darkModeEnabled,
+      logoSizeRatio = 1,
+      navigationBarHeight = 0,
+      statusBarHeight = 0,
+    },
+  ] = useState(() => NativeModule.getConstants());
+
+  const backgroundColor: string =
+    darkModeEnabled && manifest.darkBackground != null
+      ? manifest.darkBackground
+      : manifest.background;
+
+  const logoFinalSrc: ImageRequireSource | undefined = skipLogo
+    ? undefined
+    : darkModeEnabled && darkLogoSrc != null
+      ? darkLogoSrc
+      : logoSrc;
+
+  const brandFinalSrc: ImageRequireSource | undefined = skipBrand
+    ? undefined
+    : darkModeEnabled && darkBrandSrc != null
+      ? darkBrandSrc
+      : brandSrc;
+
+  const ref = useRef({
+    layoutReady: false,
+    logoReady: skipLogo,
+    brandReady: skipBrand,
+    userReady: ready,
+
+    animate,
+    animateHasBeenCalled: false,
+  });
+
+  const maybeRunAnimate = useCallback(() => {
+    if (
+      ref.current.layoutReady &&
+      ref.current.logoReady &&
+      ref.current.brandReady &&
+      ref.current.userReady &&
+      !ref.current.animateHasBeenCalled
+    ) {
+      ref.current.animateHasBeenCalled = true;
+
+      hide({ fade: false })
+        .then(() => ref.current.animate())
+        .catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
+    ref.current.animate = animate;
+    ref.current.userReady = ready;
+
+    maybeRunAnimate();
+  });
+
+  return useMemo<UseHideAnimation>(() => {
+    const containerStyle: ViewStyle = {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor,
+      alignItems: "center",
+      justifyContent: "center",
+    };
+
+    const container: ContainerProps = {
+      style: containerStyle,
+      onLayout: () => {
+        ref.current.layoutReady = true;
+        maybeRunAnimate();
       },
-    ] = useState(() => NativeModule.getConstants());
+    };
 
-    const backgroundColor: string =
-      darkModeEnabled && manifest.darkBackground != null
-        ? manifest.darkBackground
-        : manifest.background;
-
-    const logoFinalSrc: ImageRequireSource | undefined = skipLogo
-      ? undefined
-      : darkModeEnabled && darkLogoSrc != null
-        ? darkLogoSrc
-        : logoSrc;
-
-    const brandFinalSrc: ImageRequireSource | undefined = skipBrand
-      ? undefined
-      : darkModeEnabled && darkBrandSrc != null
-        ? darkBrandSrc
-        : brandSrc;
-
-    const animateFn = useRef(animate);
-    const layoutReady = useRef(false);
-    const logoReady = useRef(skipLogo);
-    const brandReady = useRef(skipBrand);
-    const animateHasBeenCalled = useRef(false);
-
-    useEffect(() => {
-      animateFn.current = animate;
-    });
-
-    const maybeRunAnimate = useCallback(() => {
-      if (
-        layoutReady.current &&
-        logoReady.current &&
-        brandReady.current &&
-        !animateHasBeenCalled.current
-      ) {
-        animateHasBeenCalled.current = true;
-        hide({ fade: false })
-          .then(() => animateFn.current())
-          .catch(() => { });
-      }
-    }, []);
-
-    return useMemo<UseHideAnimation>(() => {
-      const containerStyle: ViewStyle = {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor,
-        alignItems: "center",
-        justifyContent: "center",
-      };
-
-      const container: ViewProps = {
-        style: containerStyle,
-        onLayout: () => {
-          layoutReady.current = true;
-          maybeRunAnimate();
-        },
-      };
-
-      const logo: ImageProps =
-        logoFinalSrc == null
-          ? { source: -1 }
-          : {
+    const logo: LogoProps =
+      logoFinalSrc == null
+        ? { source: -1 }
+        : {
+            source: logoFinalSrc,
             fadeDuration: 0,
             resizeMode: "contain",
-            source: logoFinalSrc,
             style: {
               width: logoWidth,
               height: logoHeight,
             },
             onLoadEnd: () => {
-              logoReady.current = true;
+              ref.current.logoReady = true;
               maybeRunAnimate();
             },
           };
 
-      const brand: ImageProps =
-        brandFinalSrc == null
-          ? { source: -1 }
-          : {
+    const brand: BrandProps =
+      brandFinalSrc == null
+        ? { source: -1 }
+        : {
+            source: brandFinalSrc,
             fadeDuration: 0,
             resizeMode: "contain",
-            source: brandFinalSrc,
             style: {
               position: "absolute",
               bottom: Platform.OS === "web" ? 60 : brandBottom,
@@ -184,56 +210,55 @@ export function useHideAnimation(config: UseHideAnimationConfig) {
               height: brandHeight,
             },
             onLoadEnd: () => {
-              brandReady.current = true;
+              ref.current.brandReady = true;
               maybeRunAnimate();
             },
           };
 
-      if (Platform.OS !== "android") {
-        return { container, logo, brand };
-      }
+    if (Platform.OS !== "android") {
+      return { container, logo, brand };
+    }
 
-      return {
-        container: {
-          ...container,
-          style: {
-            ...containerStyle,
-            marginTop: statusBarTranslucent ? undefined : -statusBarHeight,
-            marginBottom: navigationBarTranslucent
-              ? undefined
-              : -navigationBarHeight,
-          },
+    return {
+      container: {
+        ...container,
+        style: {
+          ...containerStyle,
+          marginTop: statusBarTranslucent ? undefined : -statusBarHeight,
+          marginBottom: navigationBarTranslucent
+            ? undefined
+            : -navigationBarHeight,
         },
-        logo: {
-          ...logo,
-          style: {
-            width: logoWidth * logoSizeRatio,
-            height: logoHeight * logoSizeRatio,
-          },
+      },
+      logo: {
+        ...logo,
+        style: {
+          width: logoWidth * logoSizeRatio,
+          height: logoHeight * logoSizeRatio,
         },
-        brand,
-      };
-    }, [
-      logoSizeRatio,
-      navigationBarHeight,
-      statusBarHeight,
+      },
+      brand,
+    };
+  }, [
+    logoSizeRatio,
+    navigationBarHeight,
+    statusBarHeight,
 
-      maybeRunAnimate,
+    maybeRunAnimate,
 
-      logoWidth,
-      logoHeight,
-      brandBottom,
-      brandWidth,
-      brandHeight,
+    logoWidth,
+    logoHeight,
+    brandBottom,
+    brandWidth,
+    brandHeight,
 
-      backgroundColor,
-      logoFinalSrc,
-      brandFinalSrc,
+    backgroundColor,
+    logoFinalSrc,
+    brandFinalSrc,
 
-      statusBarTranslucent,
-      navigationBarTranslucent,
-    ]);
-  }
+    statusBarTranslucent,
+    navigationBarTranslucent,
+  ]);
 }
 
 export default {

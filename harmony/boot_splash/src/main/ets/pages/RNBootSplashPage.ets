@@ -22,43 +22,21 @@
  * SOFTWARE.
  */
 
-import hilog from '@ohos.hilog';
+import { SPLASH_LOGO_ID } from '../const/Const';
 
-class Logger {
-  private domain : number;
-  private prefix : string;
-  private format : string = '%{public}s, %{public}s';
-  private isDebug : boolean;
+export const entryName: string = 'BootSplashPage';
 
-  /**
-   * constructor.
-   *
-   * @param Prefix Identifies the log tag.
-   * @param domain Domain Indicates the service domain, which is a hexadecimal integer ranging from 0x0 to 0xFFFFF.
-   */
-  constructor(prefix: string = 'MyApp', domain: number = 0xFF00, isDebug = false) {
-    this.prefix = prefix;
-    this.domain = domain;
-    this.isDebug = isDebug;
-  }
+@Entry({ routeName: entryName })
+@Component
+export struct RNBootSplashPage {
+  private splash_logo: string = 'app.media.' + SPLASH_LOGO_ID;
 
-  debug(...args: string[]): void {
-    if (this.isDebug) {
-      hilog.debug(this.domain, this.prefix, this.format, args);
+  build() {
+    Row() {
+      Image($r(this.splash_logo)).objectFit(ImageFit.Contain).fitOriginalSize(true)
     }
-  }
-
-  info(...args: string[]): void {
-    hilog.info(this.domain, this.prefix, this.format, args);
-  }
-
-  warn(...args: string[]) : void {
-    hilog.warn(this.domain, this.prefix, this.format, args);
-  }
-
-  error(...args: string[]) : void {
-    hilog.error(this.domain, this.prefix, this.format, args);
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
   }
 }
-
-export default new Logger('RNBootSplash', 0xFF00, false)
