@@ -1,13 +1,13 @@
 # @react-native-oh-tpl/react-native-bootsplash
 
-## 文档地址 / Documentation URL 
+This project is based on [react-native-bootsplash](https://github.com/zoontek/react-native-bootsplash)
 
-[中文 / Chinese](https://gitee.com/react-native-oh-library/usage-docs/blob/master/zh-cn/react-native-bootsplash.md)
+## Documentation
 
-## Codegen
+[中文](https://gitee.com/react-native-oh-library/usage-docs/blob/master/zh-cn/react-native-bootsplash.md)
 
-该库已接入 codegen，具体请查阅文档。
+[English](https://gitee.com/react-native-oh-library/usage-docs/blob/master/en/react-native-bootsplash.md)
 
-## 请悉知 / Acknowledgements
+## License
 
-本项目基于 [The MIT License (MIT)](https://github.com/react-native-oh-library/react-native-bootsplash/blob/sig/LICENSE) ，请自由地享受和参与开源。
+This library is licensed under [The MIT License (MIT)](https://github.com/zoontek/react-native-bootsplash/blob/master/LICENSE).
