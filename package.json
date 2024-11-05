@@ -10,14 +10,8 @@
   "types": "dist/typescript/index.d.ts",
   "files": [
     "dist",
-    "android",
-    "ios",
     "src",
     "harmony",
-    "!android/build",
-    "!android/.cxx",
-    "!android/.gradle",
-    "!ios/build",
     "!src/addon",
     "RNBootSplash.podspec",
     "app.plugin.js",
@@ -40,10 +34,12 @@
     "launchscreen"
   ],
   "scripts": {
+    "clean": "rm -rf dist",
     "format": "prettier '**/*' -u -w",
     "lint": "eslint --ext ts,tsx ./src",
     "typecheck": "tsc --noEmit",
-    "build": "bob build"
+    "build": "yarn clean && bob build && rm -rf dist/commonjs/package.json",
+    "prepack": "bob build"
   },
   "react-native-builder-bob": {
     "source": "src",
@@ -101,13 +97,5 @@
           "./src"
         ]
       }
-    },
-  "codegenConfig": {
-    "name": "RNBootSplashSpec",
-    "type": "modules",
-    "jsSrcsDir": "./src",
-    "android": {
-      "javaPackageName": "com.zoontek.rnbootsplash"
     }
-  }
 }
