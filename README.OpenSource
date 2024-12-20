@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "react-native-bootsplash",
+        "License": "MIT License",
+        "License File": "https://github.com/zoontek/react-native-bootsplash/blob/master/LICENSE",
+        "Version Number": "6.3.2",
+        "Owner" : "xiafeng@huawei.com",
+        "Upstream URL": "https://github.com/zoontek/react-native-bootsplash",
+        "Description": "bootsplash library for react-native"
+    }
+]
